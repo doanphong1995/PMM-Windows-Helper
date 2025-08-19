@@ -1,0 +1,25 @@
+{
+  "version": 1,
+  "apps": [
+    {
+      "id": "chrome",
+      "name": "Google Chrome",
+      "wingetId": "Google.Chrome",
+      "defaultSelected": true,
+      "group": "Browser"
+    },
+    {
+      "id": "vscode",
+      "name": "Visual Studio Code",
+      "wingetId": "Microsoft.VisualStudioCode",
+      "defaultSelected": true,
+      "group": "Dev"
+    },
+    {
+      "id": "7zip",
+      "name": "7-Zip",
+      "wingetId": "7zip.7zip",
+      "group": "Utility"
+    }
+  ]
+}
