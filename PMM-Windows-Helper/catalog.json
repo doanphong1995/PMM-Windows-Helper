@@ -1,5 +1,5 @@
 {
-  "version": 1,
+  "version": 1.2,
   "apps": [
     {
       "id": "chrome",
@@ -140,6 +140,13 @@
       "wingetId": "EVKey.EVKey",
       "group": "Utility",
       "defaultSelected": true
+    },
+    {
+      "id": "irfanview",
+      "name": "IrfanView",
+      "wingetId": "IrfanSkiljan.IrfanView",
+      "group": "Media",
+      "defaultSelected": false
     }
   ]
 }
