@@ -40,7 +40,7 @@
             this.Name = "frmMain";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Phong Mạnh Mẽ Windows Helper";
-            this.Load += new System.EventHandler(this.frmMain_Load);
+            //this.Load += new System.EventHandler(this.frmMain_Load);
             this.ResumeLayout(false);
 
         }

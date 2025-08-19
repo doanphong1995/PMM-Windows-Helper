@@ -40,23 +40,6 @@ namespace PMM_Windows_Helper
             return "—";
         }
 
-        public async IAsyncEnumerable<InstallResult> InstallSelectedAsync(IEnumerable<string> wingetIds, IProgress<string> log, [System.Runtime.CompilerServices.EnumeratorCancellation] CancellationToken ct = default(CancellationToken))
-        {
-            foreach (var id in wingetIds)
-            {
-                ct.ThrowIfCancellationRequested();
-                log?.Report($"[INFO] Installing {id} ...");
-
-                var args = $"install --id {id} --silent --accept-package-agreements --accept-source-agreements";
-                var (exit, output) = await RunAsync(args, ct);
-
-                log?.Report($"[INFO] {id} ExitCode={exit}");
-                if (!string.IsNullOrEmpty(output))
-                    log?.Report(output);
-
-                yield return new InstallResult { WingetId = id, ExitCode = exit, Output = output };
-            }
-        }
 
         public async Task<(int exitCode, string output)> RunAsync(string wingetArgs, CancellationToken ct = default(CancellationToken))
         {

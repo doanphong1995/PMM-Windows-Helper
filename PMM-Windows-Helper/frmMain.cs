@@ -5,6 +5,7 @@ using System.Data;
 using System.Drawing;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
@@ -12,53 +13,51 @@ namespace PMM_Windows_Helper
 {
     public partial class frmMain : Form
     {
-        // --- Softwares tab controls ---
+        // ====== Config của bạn ======
+        private const string CATALOG_URL = "https://raw.githubusercontent.com/doanphong1995/PMM-Windows-Helper/refs/heads/master/PMM-Windows-Helper/catalog.json";
+
+        // ====== UI ======
         TabControl tabs;
         TabPage tabSoftwares, tabTweaks;
 
-        TableLayoutPanel tlpSoft;          // layout chính cho tab Softwares
-        Panel topBarSoft;                   // thanh công cụ phía trên
+        TableLayoutPanel tlpSoft;
+        Panel topBarSoft;
         TextBox txtSearch;
         CheckBox cbSelectAll;
-        Button btnSelectNone, btnInstallSelected, btnRefreshVersions;
-        ListView lvSoftwares;               // danh sách phần mềm
+        Button btnSelectNone, btnInstallSelected, btnRefreshVersions, btnReloadCatalog;
+        ListView lvSoftwares;
         StatusStrip statusSoft;
         ToolStripStatusLabel lblSoftCount;
 
-        // --- Tweaks tab controls ---
         TableLayoutPanel tlpTweaks;
         FlowLayoutPanel flowTweaks;
         Button btnApplyTweaks;
 
-        // Dữ liệu mẫu – bạn sẽ nối với winget sau
-        class AppItem { public string Name; public string Version; public bool Selected; }
-        List<AppItem> _apps;
+        // ====== Data/Services ======
+        private readonly GitCatalogService _catalogService = new GitCatalogService(CATALOG_URL);
+        private readonly WingetInstallerService _winget = new WingetInstallerService();
+        private List<AppItem> _apps = new List<AppItem>();           // toàn bộ từ catalog
+        private List<AppItem> _viewApps = new List<AppItem>();        // danh sách đang hiển thị (sau khi filter)
+        private readonly Dictionary<string, ListViewItem> _rowById = new Dictionary<string, ListViewItem>(StringComparer.OrdinalIgnoreCase);
+        private CancellationTokenSource _ctsVersions;
+
         public frmMain()
         {
-            InitializeComponent();
             Text = "WinSetup Helper";
             MinimumSize = new Size(900, 600);
             StartPosition = FormStartPosition.CenterScreen;
-            Font = new Font("Segoe UI", 9F);               // giúp scale tốt hơn
+            Font = new Font("Segoe UI", 9F);
             AutoScaleMode = AutoScaleMode.Font;
 
             BuildTabs();
             BuildSoftwaresTab();
             BuildTweaksTab();
 
-            // Nạp dữ liệu mẫu
-            LoadSampleApps();
-            BindAppsToListView();
-
-            // Sự kiện chung
             Resize += (s, e) => AutoResizeListViewColumns();
+            Shown += async (s, e) => await LoadCatalogAndRenderAsync(); // tự load catalog khi mở form
         }
 
-        private void frmMain_Load(object sender, EventArgs e)
-        {
-
-        }
-
+        // ========== UI Builders ==========
         void BuildTabs()
         {
             tabs = new TabControl { Dock = DockStyle.Fill, HotTrack = true };
@@ -66,35 +65,34 @@ namespace PMM_Windows_Helper
             tabTweaks = new TabPage("Tweaks");
             tabs.TabPages.Add(tabSoftwares);
             tabs.TabPages.Add(tabTweaks);
-
             Controls.Add(tabs);
         }
 
         void BuildSoftwaresTab()
         {
-            // TableLayout: 3 hàng (TopBar - ListView - StatusStrip)
             tlpSoft = new TableLayoutPanel
             {
                 Dock = DockStyle.Fill,
                 ColumnCount = 1,
                 RowCount = 3
             };
-            tlpSoft.RowStyles.Add(new RowStyle(SizeType.AutoSize));    // top bar cao theo nội dung
-            tlpSoft.RowStyles.Add(new RowStyle(SizeType.Percent, 100)); // ListView chiếm hết
-            tlpSoft.RowStyles.Add(new RowStyle(SizeType.AutoSize));    // status strip
+            tlpSoft.RowStyles.Add(new RowStyle(SizeType.AutoSize));
+            tlpSoft.RowStyles.Add(new RowStyle(SizeType.Percent, 100));
+            tlpSoft.RowStyles.Add(new RowStyle(SizeType.AutoSize));
 
-            // --- Top bar ---
+            // Top bar
             topBarSoft = new Panel { Dock = DockStyle.Top, Height = 40, Padding = new Padding(8) };
-
             txtSearch = new TextBox { Width = 260, Anchor = AnchorStyles.Left | AnchorStyles.Top };
+
             cbSelectAll = new CheckBox { Text = "Select All", AutoSize = true, Left = 270, Top = 5 };
             btnSelectNone = new Button { Text = "Select None", AutoSize = true, Left = 360, Top = 0 };
             btnInstallSelected = new Button { Text = "Install Selected", AutoSize = true, Left = 470, Top = 0 };
             btnRefreshVersions = new Button { Text = "Refresh Versions", AutoSize = true, Left = 600, Top = 0 };
+            btnReloadCatalog = new Button { Text = "Reload Catalog", AutoSize = true, Left = 740, Top = 0 };
 
-            topBarSoft.Controls.AddRange(new Control[] { txtSearch, cbSelectAll, btnSelectNone, btnInstallSelected, btnRefreshVersions });
+            topBarSoft.Controls.AddRange(new Control[] { txtSearch, cbSelectAll, btnSelectNone, btnInstallSelected, btnRefreshVersions, btnReloadCatalog });
 
-            // --- ListView ---
+            // ListView
             lvSoftwares = new ListView
             {
                 Dock = DockStyle.Fill,
@@ -105,26 +103,23 @@ namespace PMM_Windows_Helper
                 GridLines = true
             };
             lvSoftwares.Columns.Add("Software", 500, HorizontalAlignment.Left);
-            lvSoftwares.Columns.Add("Version", 120, HorizontalAlignment.Right);
+            lvSoftwares.Columns.Add("Version", 160, HorizontalAlignment.Right);
 
-            // --- Status strip ---
+            // Status
             statusSoft = new StatusStrip();
             lblSoftCount = new ToolStripStatusLabel("0 items");
             statusSoft.Items.Add(lblSoftCount);
 
-            // Add vào layout
             tlpSoft.Controls.Add(topBarSoft, 0, 0);
             tlpSoft.Controls.Add(lvSoftwares, 0, 1);
             tlpSoft.Controls.Add(statusSoft, 0, 2);
-
             tabSoftwares.Controls.Add(tlpSoft);
 
-            // --- Wire events ---
+            // Events
             cbSelectAll.CheckedChanged += (s, e) =>
             {
                 lvSoftwares.BeginUpdate();
-                foreach (ListViewItem it in lvSoftwares.Items)
-                    it.Checked = cbSelectAll.Checked;
+                foreach (ListViewItem it in lvSoftwares.Items) it.Checked = cbSelectAll.Checked;
                 lvSoftwares.EndUpdate();
                 UpdateSoftCount();
             };
@@ -132,71 +127,52 @@ namespace PMM_Windows_Helper
             btnSelectNone.Click += (s, e) =>
             {
                 lvSoftwares.BeginUpdate();
-                foreach (ListViewItem it in lvSoftwares.Items)
-                    it.Checked = false;
+                foreach (ListViewItem it in lvSoftwares.Items) it.Checked = false;
                 lvSoftwares.EndUpdate();
-                cbSelectAll.CheckedChanged -= null; // no-op; tránh vòng lặp
                 cbSelectAll.Checked = false;
                 UpdateSoftCount();
             };
 
-            btnInstallSelected.Click += (s, e) =>
+            btnInstallSelected.Click += async (s, e) =>
             {
-                // Chưa cài đặt tại đây – phần logic cài winget để sau.
-                var selected = lvSoftwares.CheckedItems.Cast<ListViewItem>()
-                                  .Select(i => i.SubItems[0].Text).ToList();
-                if (selected.Count == 0)
+                var ids = lvSoftwares.CheckedItems.Cast<ListViewItem>()
+                                 .Select(i => ((AppItem)i.Tag).wingetId)
+                                 .Where(id => !string.IsNullOrWhiteSpace(id))
+                                 .Distinct(StringComparer.OrdinalIgnoreCase)
+                                 .ToList();
+                if (ids.Count == 0)
                 {
                     MessageBox.Show("Hãy chọn ít nhất một phần mềm.", "Info", MessageBoxButtons.OK, MessageBoxIcon.Information);
                     return;
                 }
-                MessageBox.Show("Sẽ cài: " + string.Join(", ", selected), "Preview", MessageBoxButtons.OK, MessageBoxIcon.Information);
+
+                // Ở đây bạn sẽ nối với _winget.InstallSelectedAsync(...) (đã có trong service)
+                MessageBox.Show("Preview cài đặt:\n" + string.Join("\n", ids), "Install", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                // TODO: gọi _winget.InstallSelectedAsync(ids, progress, token) + cập nhật UI/log
             };
 
-            btnRefreshVersions.Click += (s, e) =>
-            {
-                // Sau này nối với “winget show/upgrade --available”.
-                // Tạm thời mô phỏng cập nhật.
-                foreach (ListViewItem it in lvSoftwares.Items)
-                {
-                    // Demo: giữ nguyên Version cũ
-                    // Thực tế: gọi phương thức cập nhật phiên bản ở đây.
-                }
-                MessageBox.Show("Versions refreshed (demo).", "Info", MessageBoxButtons.OK, MessageBoxIcon.Information);
-            };
+            btnRefreshVersions.Click += async (s, e) => await RefreshVersionsAsync();
+
+            btnReloadCatalog.Click += async (s, e) => await LoadCatalogAndRenderAsync();
 
             txtSearch.TextChanged += (s, e) =>
             {
-                var key = txtSearch.Text.Trim().ToLowerInvariant();
-                lvSoftwares.BeginUpdate();
-                lvSoftwares.Items.Clear();
-                foreach (var a in _apps.Where(x => x.Name.ToLowerInvariant().Contains(key)))
-                    lvSoftwares.Items.Add(MakeItem(a));
-                lvSoftwares.EndUpdate();
-                UpdateSoftCount();
-                AutoResizeListViewColumns();
+                ApplySearch(txtSearch.Text);
             };
 
             lvSoftwares.ItemChecked += (s, e) =>
             {
-                // Giữ trạng thái Select All nếu tất cả đều được check
                 cbSelectAll.CheckedChanged -= CbSelectAll_SyncGuard;
                 cbSelectAll.Checked = lvSoftwares.Items.Count > 0 && lvSoftwares.CheckedItems.Count == lvSoftwares.Items.Count;
                 cbSelectAll.CheckedChanged += CbSelectAll_SyncGuard;
-
                 UpdateSoftCount();
             };
             cbSelectAll.CheckedChanged += CbSelectAll_SyncGuard;
         }
-
-        void CbSelectAll_SyncGuard(object sender, EventArgs e)
-        {
-            // placeholder để detach/attach ở trên, tránh vòng lặp sự kiện
-        }
+        void CbSelectAll_SyncGuard(object sender, EventArgs e) { /* guard */ }
 
         void BuildTweaksTab()
         {
-            // TableLayout: 2 hàng (Flow tweaks - Button apply)
             tlpTweaks = new TableLayoutPanel
             {
                 Dock = DockStyle.Fill,
@@ -213,8 +189,6 @@ namespace PMM_Windows_Helper
                 Padding = new Padding(12),
                 WrapContents = true
             };
-
-            // Ví dụ các tweak (chỉ UI; logic áp dụng để sau)
             flowTweaks.Controls.AddRange(new Control[]
             {
                 new CheckBox { Text = "Show file extensions", AutoSize = true, Margin = new Padding(8)},
@@ -226,13 +200,7 @@ namespace PMM_Windows_Helper
                 new CheckBox { Text = "Enable .NET Framework 3.5", AutoSize = true, Margin = new Padding(8)},
             });
 
-            btnApplyTweaks = new Button
-            {
-                Text = "Apply Tweaks",
-                AutoSize = true,
-                Anchor = AnchorStyles.Right,
-                Margin = new Padding(12)
-            };
+            btnApplyTweaks = new Button { Text = "Apply Tweaks", AutoSize = true, Margin = new Padding(12) };
             var panelBottom = new Panel { Dock = DockStyle.Fill, Height = 48 };
             btnApplyTweaks.Left = 12; btnApplyTweaks.Top = 8;
             panelBottom.Controls.Add(btnApplyTweaks);
@@ -244,64 +212,153 @@ namespace PMM_Windows_Helper
 
             btnApplyTweaks.Click += (s, e) =>
             {
-                // Chưa áp dụng ở đây – để phần logic sau.
                 MessageBox.Show("Tweaks will be applied (demo).", "Info", MessageBoxButtons.OK, MessageBoxIcon.Information);
             };
         }
 
-        void LoadSampleApps()
+        // ========== Data binding & helpers ==========
+        private async Task LoadCatalogAndRenderAsync()
         {
-            _apps = new List<AppItem>
+            ToggleSoftControls(false);
+            try
             {
-                new AppItem { Name = "Google Chrome", Version = "—", Selected = true },
-                new AppItem { Name = "Visual Studio Code", Version = "—", Selected = true },
-                new AppItem { Name = "7-Zip", Version = "—", Selected = true },
-                new AppItem { Name = "Git", Version = "—", Selected = false },
-                new AppItem { Name = "VLC media player", Version = "—", Selected = false },
-                new AppItem { Name = "Notepad++", Version = "—", Selected = false },
-                new AppItem { Name = "Everything", Version = "—", Selected = false },
-                new AppItem { Name = "PowerToys", Version = "—", Selected = false },
-                new AppItem { Name = "SumatraPDF", Version = "—", Selected = false },
-            };
+                _rowById.Clear();
+                lvSoftwares.Items.Clear();
+                UpdateSoftCount();
+
+                var catalog = await _catalogService.GetCatalogAsync();
+                _apps = (catalog.apps ?? new List<AppItem>())
+                        .Where(a => !string.IsNullOrWhiteSpace(a.id) && !string.IsNullOrWhiteSpace(a.name))
+                        .ToList();
+
+                // Render tất cả, sau đó refresh version
+                _viewApps = _apps.ToList();
+                BindAppsToListView(_viewApps);
+
+                await RefreshVersionsAsync(); // lấy phiên bản mới nhất rồi fill cột Version
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Load catalog failed: " + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+            finally
+            {
+                ToggleSoftControls(true);
+            }
         }
 
-        void BindAppsToListView()
+        private void BindAppsToListView(List<AppItem> apps)
         {
             lvSoftwares.BeginUpdate();
             lvSoftwares.Items.Clear();
-            foreach (var a in _apps)
+            _rowById.Clear();
+
+            foreach (var a in apps)
             {
-                var item = MakeItem(a);
-                lvSoftwares.Items.Add(item);
+                var it = new ListViewItem(a.name)
+                {
+                    Checked = a.defaultSelected,
+                    Tag = a
+                };
+                it.SubItems.Add("…"); // chờ cập nhật phiên bản
+                lvSoftwares.Items.Add(it);
+                _rowById[a.id] = it;
             }
+
             lvSoftwares.EndUpdate();
             UpdateSoftCount();
             AutoResizeListViewColumns();
         }
 
-        ListViewItem MakeItem(AppItem a)
+        private void ApplySearch(string keyword)
         {
-            var it = new ListViewItem(a.Name) { Checked = a.Selected, Tag = a };
-            it.SubItems.Add(a.Version ?? "—");
-            return it;
+            var key = (keyword ?? "").Trim().ToLowerInvariant();
+            if (string.IsNullOrEmpty(key))
+            {
+                _viewApps = _apps.ToList();
+            }
+            else
+            {
+                _viewApps = _apps.Where(x =>
+                    (x.name ?? "").ToLowerInvariant().Contains(key) ||
+                    (x.group ?? "").ToLowerInvariant().Contains(key) ||
+                    (x.id ?? "").ToLowerInvariant().Contains(key)
+                ).ToList();
+            }
+            BindAppsToListView(_viewApps);
         }
 
-        void UpdateSoftCount()
+        private void UpdateSoftCount()
         {
             lblSoftCount.Text = $"{lvSoftwares.Items.Count} items | {lvSoftwares.CheckedItems.Count} selected";
         }
 
-        void AutoResizeListViewColumns()
+        private void AutoResizeListViewColumns()
         {
             if (lvSoftwares.Columns.Count < 2) return;
-
-            // Giữ cột Version ~120px, còn lại cho cột Name
             int versionWidth = 160;
             int total = lvSoftwares.ClientSize.Width;
             int nameWidth = Math.Max(200, total - versionWidth - SystemInformation.VerticalScrollBarWidth - 4);
-
             lvSoftwares.Columns[0].Width = nameWidth;
             lvSoftwares.Columns[1].Width = versionWidth;
+        }
+
+        private void ToggleSoftControls(bool enabled)
+        {
+            topBarSoft.Enabled = enabled;
+            lvSoftwares.Enabled = enabled;
+        }
+
+        // ========== Version refresh (winget) ==========
+        private async Task RefreshVersionsAsync()
+        {
+            // Hủy lần refresh đang chạy (nếu có)
+            _ctsVersions?.Cancel();
+            _ctsVersions = new CancellationTokenSource();
+            var ct = _ctsVersions.Token;
+
+            ToggleSoftControls(false);
+            try
+            {
+                // Giới hạn song song 3 luồng (đủ nhẹ để UI mượt)
+                using (var sem = new System.Threading.SemaphoreSlim(3))
+                {
+                    var tasks = _viewApps
+                        .Where(a => !string.IsNullOrWhiteSpace(a.wingetId))
+                        .Select(async a =>
+                        {
+                            await sem.WaitAsync(ct);
+                            try
+                            {
+                                var ver = await _winget.GetLatestVersionAsync(a.wingetId, ct);
+                                // cập nhật UI
+                                if (_rowById.TryGetValue(a.id, out var row))
+                                {
+                                    // WinForms là single-threaded; đảm bảo update trên UI thread
+                                    if (InvokeRequired)
+                                        BeginInvoke(new Action(() => row.SubItems[1].Text = ver));
+                                    else
+                                        row.SubItems[1].Text = ver;
+                                }
+                            }
+                            finally { sem.Release(); }
+                        }).ToList();
+
+                    await Task.WhenAll(tasks);
+                }
+            }
+            catch (OperationCanceledException)
+            {
+                // user/thao tác khác hủy – bỏ qua
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Refresh versions failed: " + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+            finally
+            {
+                ToggleSoftControls(true);
+            }
         }
     }
 }

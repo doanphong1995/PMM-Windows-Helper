@@ -5,21 +5,141 @@
       "id": "chrome",
       "name": "Google Chrome",
       "wingetId": "Google.Chrome",
-      "defaultSelected": true,
-      "group": "Browser"
+      "group": "Browser",
+      "defaultSelected": true
     },
     {
-      "id": "vscode",
-      "name": "Visual Studio Code",
-      "wingetId": "Microsoft.VisualStudioCode",
-      "defaultSelected": true,
-      "group": "Dev"
+      "id": "firefox",
+      "name": "Mozilla Firefox",
+      "wingetId": "Mozilla.Firefox",
+      "group": "Browser",
+      "defaultSelected": false
     },
     {
       "id": "7zip",
       "name": "7-Zip",
       "wingetId": "7zip.7zip",
-      "group": "Utility"
+      "group": "Utility",
+      "defaultSelected": true
+    },
+    {
+      "id": "winrar",
+      "name": "WinRAR",
+      "wingetId": "RARLab.WinRAR",
+      "group": "Utility",
+      "defaultSelected": false
+    },
+    {
+      "id": "vlc",
+      "name": "VLC media player",
+      "wingetId": "VideoLAN.VLC",
+      "group": "Media",
+      "defaultSelected": true
+    },
+    {
+      "id": "viber",
+      "name": "Viber",
+      "wingetId": "Viber.Viber",
+      "group": "Chat",
+      "defaultSelected": false
+    },
+    {
+      "id": "zalo",
+      "name": "Zalo PC",
+      "wingetId": "VNGCorp.Zalo",
+      "group": "Chat",
+      "defaultSelected": true
+    },
+    {
+      "id": "telegram",
+      "name": "Telegram Desktop",
+      "wingetId": "Telegram.TelegramDesktop",
+      "group": "Chat",
+      "defaultSelected": false
+    },
+    {
+      "id": "vscode",
+      "name": "Visual Studio Code",
+      "wingetId": "Microsoft.VisualStudioCode",
+      "group": "Dev",
+      "defaultSelected": true
+    },
+    {
+      "id": "vscommunity",
+      "name": "Visual Studio Community 2022",
+      "wingetId": "Microsoft.VisualStudio.2022.Community",
+      "group": "Dev",
+      "defaultSelected": false
+    },
+    {
+      "id": "intellij",
+      "name": "IntelliJ IDEA Community",
+      "wingetId": "JetBrains.IntelliJIDEA.Community",
+      "group": "Dev",
+      "defaultSelected": false
+    },
+    {
+      "id": "pycharm",
+      "name": "PyCharm Community",
+      "wingetId": "JetBrains.PyCharm.Community",
+      "group": "Dev",
+      "defaultSelected": false
+    },
+    {
+      "id": "androidstudio",
+      "name": "Android Studio",
+      "wingetId": "Google.AndroidStudio",
+      "group": "Dev",
+      "defaultSelected": false
+    },
+    {
+      "id": "lark",
+      "name": "Lark",
+      "wingetId": "Bytedance.Lark",
+      "group": "Collaboration",
+      "defaultSelected": false
+    },
+    {
+      "id": "notepadpp",
+      "name": "Notepad++",
+      "wingetId": "Notepad++.Notepad++",
+      "group": "Utility",
+      "defaultSelected": true
+    },
+    {
+      "id": "drawio",
+      "name": "draw.io (diagrams.net)",
+      "wingetId": "JGraph.Draw",
+      "group": "Utility",
+      "defaultSelected": false
+    },
+    {
+      "id": "everything",
+      "name": "Everything",
+      "wingetId": "voidtools.Everything",
+      "group": "Utility",
+      "defaultSelected": true
+    },
+    {
+      "id": "hibit",
+      "name": "HiBit Uninstaller",
+      "wingetId": "HiBitSoftware.HiBitUninstaller",
+      "group": "Utility",
+      "defaultSelected": false
+    },
+    {
+      "id": "ultraview",
+      "name": "UltraViewer",
+      "wingetId": "UltraViewer.UltraViewer",
+      "group": "Remote",
+      "defaultSelected": false
+    },
+    {
+      "id": "evkey",
+      "name": "EVKey",
+      "wingetId": "EVKey.EVKey",
+      "group": "Utility",
+      "defaultSelected": true
     }
   ]
 }
