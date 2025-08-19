@@ -1,0 +1,339 @@
+{
+  "categories": [
+    {
+      "name": "Browsers",
+      "softwares": [
+        {
+          "id": "chrome",
+          "name": "Google Chrome",
+          "description": "Fast, secure, and free web browser built for the modern web",
+          "downloadUrl": "https://www.google.com/chrome/",
+          "version": "Latest",
+          "icon": "https://www.google.com/chrome/static/images/chrome-logo-m100.svg",
+          "size": "85MB",
+          "category": "Browsers"
+        },
+        {
+          "id": "firefox",
+          "name": "Mozilla Firefox",
+          "description": "Free and open-source web browser developed by Mozilla",
+          "downloadUrl": "https://www.mozilla.org/en-US/firefox/new/",
+          "version": "Latest",
+          "icon": "https://www.mozilla.org/media/img/firefox/favicon.ico",
+          "size": "55MB",
+          "category": "Browsers"
+        },
+        {
+          "id": "edge",
+          "name": "Microsoft Edge",
+          "description": "Microsoft's modern web browser with enhanced security",
+          "downloadUrl": "https://www.microsoft.com/en-us/edge",
+          "version": "Latest",
+          "icon": "https://edgestatic.azureedge.net/shared/cms/lrs1c69a1j/section-assets/a9188de5-7790-4006-9899-43d7bf1a2304.svg",
+          "size": "70MB",
+          "category": "Browsers"
+        },
+        {
+          "id": "brave",
+          "name": "Brave Browser",
+          "description": "Privacy-focused browser that blocks ads and trackers",
+          "downloadUrl": "https://brave.com/download/",
+          "version": "Latest",
+          "icon": "https://brave.com/favicon.ico",
+          "size": "95MB",
+          "category": "Browsers"
+        }
+      ]
+    },
+    {
+      "name": "Development",
+      "softwares": [
+        {
+          "id": "vscode",
+          "name": "Visual Studio Code",
+          "description": "Free source-code editor with debugging support",
+          "downloadUrl": "https://code.visualstudio.com/download",
+          "version": "Latest",
+          "icon": "https://code.visualstudio.com/favicon.ico",
+          "size": "90MB",
+          "category": "Development"
+        },
+        {
+          "id": "git",
+          "name": "Git",
+          "description": "Distributed version control system",
+          "downloadUrl": "https://git-scm.com/downloads",
+          "version": "Latest",
+          "icon": "https://git-scm.com/images/logos/downloads/Git-Icon-1788C.png",
+          "size": "45MB",
+          "category": "Development"
+        },
+        {
+          "id": "nodejs",
+          "name": "Node.js",
+          "description": "JavaScript runtime built on Chrome's V8 JavaScript engine",
+          "downloadUrl": "https://nodejs.org/en/download/",
+          "version": "LTS",
+          "icon": "https://nodejs.org/static/images/logo.svg",
+          "size": "30MB",
+          "category": "Development"
+        },
+        {
+          "id": "python",
+          "name": "Python",
+          "description": "Programming language that lets you work quickly",
+          "downloadUrl": "https://www.python.org/downloads/",
+          "version": "3.12",
+          "icon": "https://www.python.org/static/favicon.ico",
+          "size": "25MB",
+          "category": "Development"
+        },
+        {
+          "id": "postman",
+          "name": "Postman",
+          "description": "API platform for building and using APIs",
+          "downloadUrl": "https://www.postman.com/downloads/",
+          "version": "Latest",
+          "icon": "https://www.postman.com/favicon.ico",
+          "size": "180MB",
+          "category": "Development"
+        },
+        {
+          "id": "github-desktop",
+          "name": "GitHub Desktop",
+          "description": "Simple collaboration from your desktop",
+          "downloadUrl": "https://desktop.github.com/",
+          "version": "Latest",
+          "icon": "https://desktop.github.com/images/desktop-icon.svg",
+          "size": "120MB",
+          "category": "Development"
+        }
+      ]
+    },
+    {
+      "name": "Media",
+      "softwares": [
+        {
+          "id": "vlc",
+          "name": "VLC Media Player",
+          "description": "Free and open source cross-platform multimedia player",
+          "downloadUrl": "https://www.videolan.org/vlc/download-windows.html",
+          "version": "Latest",
+          "icon": "https://www.videolan.org/favicon.ico",
+          "size": "40MB",
+          "category": "Media"
+        },
+        {
+          "id": "audacity",
+          "name": "Audacity",
+          "description": "Free, open source, cross-platform audio software",
+          "downloadUrl": "https://www.audacityteam.org/download/",
+          "version": "Latest",
+          "icon": "https://www.audacityteam.org/favicon.ico",
+          "size": "25MB",
+          "category": "Media"
+        },
+        {
+          "id": "obs-studio",
+          "name": "OBS Studio",
+          "description": "Free and open source software for video recording and live streaming",
+          "downloadUrl": "https://obsproject.com/download",
+          "version": "Latest",
+          "icon": "https://obsproject.com/favicon.ico",
+          "size": "95MB",
+          "category": "Media"
+        },
+        {
+          "id": "handbrake",
+          "name": "HandBrake",
+          "description": "Open source video transcoder",
+          "downloadUrl": "https://handbrake.fr/downloads.php",
+          "version": "Latest",
+          "icon": "https://handbrake.fr/favicon.ico",
+          "size": "20MB",
+          "category": "Media"
+        }
+      ]
+    },
+    {
+      "name": "Productivity",
+      "softwares": [
+        {
+          "id": "notion",
+          "name": "Notion",
+          "description": "All-in-one workspace for notes, tasks, wikis, and databases",
+          "downloadUrl": "https://www.notion.so/desktop",
+          "version": "Latest",
+          "icon": "https://www.notion.so/images/favicon.ico",
+          "size": "80MB",
+          "category": "Productivity"
+        },
+        {
+          "id": "obsidian",
+          "name": "Obsidian",
+          "description": "Powerful knowledge base on top of a local folder of plain text files",
+          "downloadUrl": "https://obsidian.md/download",
+          "version": "Latest",
+          "icon": "https://obsidian.md/favicon.ico",
+          "size": "75MB",
+          "category": "Productivity"
+        },
+        {
+          "id": "notepadplusplus",
+          "name": "Notepad++",
+          "description": "Free source code editor and Notepad replacement",
+          "downloadUrl": "https://notepad-plus-plus.org/downloads/",
+          "version": "Latest",
+          "icon": "https://notepad-plus-plus.org/favicon.ico",
+          "size": "8MB",
+          "category": "Productivity"
+        },
+        {
+          "id": "evernote",
+          "name": "Evernote",
+          "description": "Note taking and task management application",
+          "downloadUrl": "https://evernote.com/download",
+          "version": "Latest",
+          "icon": "https://evernote.com/favicon.ico",
+          "size": "150MB",
+          "category": "Productivity"
+        }
+      ]
+    },
+    {
+      "name": "Communication",
+      "softwares": [
+        {
+          "id": "discord",
+          "name": "Discord",
+          "description": "Voice, video and text communication service",
+          "downloadUrl": "https://discord.com/download",
+          "version": "Latest",
+          "icon": "https://discord.com/assets/favicon.ico",
+          "size": "85MB",
+          "category": "Communication"
+        },
+        {
+          "id": "slack",
+          "name": "Slack",
+          "description": "Business communication platform",
+          "downloadUrl": "https://slack.com/downloads/windows",
+          "version": "Latest",
+          "icon": "https://slack.com/favicon.ico",
+          "size": "110MB",
+          "category": "Communication"
+        },
+        {
+          "id": "zoom",
+          "name": "Zoom",
+          "description": "Video communications platform",
+          "downloadUrl": "https://zoom.us/download",
+          "version": "Latest",
+          "icon": "https://zoom.us/favicon.ico",
+          "size": "65MB",
+          "category": "Communication"
+        },
+        {
+          "id": "telegram",
+          "name": "Telegram Desktop",
+          "description": "Fast and secure messaging app",
+          "downloadUrl": "https://desktop.telegram.org/",
+          "version": "Latest",
+          "icon": "https://telegram.org/favicon.ico",
+          "size": "35MB",
+          "category": "Communication"
+        }
+      ]
+    },
+    {
+      "name": "Utilities",
+      "softwares": [
+        {
+          "id": "7zip",
+          "name": "7-Zip",
+          "description": "Open source file archiver",
+          "downloadUrl": "https://www.7-zip.org/download.html",
+          "version": "Latest",
+          "icon": "https://www.7-zip.org/favicon.ico",
+          "size": "1.5MB",
+          "category": "Utilities"
+        },
+        {
+          "id": "winrar",
+          "name": "WinRAR",
+          "description": "Powerful archive manager",
+          "downloadUrl": "https://www.win-rar.com/download.html",
+          "version": "Latest",
+          "icon": "https://www.win-rar.com/favicon.ico",
+          "size": "3MB",
+          "category": "Utilities"
+        },
+        {
+          "id": "ccleaner",
+          "name": "CCleaner",
+          "description": "System optimization and privacy tool",
+          "downloadUrl": "https://www.ccleaner.com/ccleaner/download",
+          "version": "Latest",
+          "icon": "https://www.ccleaner.com/favicon.ico",
+          "size": "25MB",
+          "category": "Utilities"
+        },
+        {
+          "id": "malwarebytes",
+          "name": "Malwarebytes",
+          "description": "Anti-malware software",
+          "downloadUrl": "https://www.malwarebytes.com/mwb-download",
+          "version": "Latest",
+          "icon": "https://www.malwarebytes.com/favicon.ico",
+          "size": "80MB",
+          "category": "Utilities"
+        },
+        {
+          "id": "everything",
+          "name": "Everything",
+          "description": "Filename search engine for Windows",
+          "downloadUrl": "https://www.voidtools.com/downloads/",
+          "version": "Latest",
+          "icon": "https://www.voidtools.com/favicon.ico",
+          "size": "2MB",
+          "category": "Utilities"
+        }
+      ]
+    },
+    {
+      "name": "Gaming",
+      "softwares": [
+        {
+          "id": "steam",
+          "name": "Steam",
+          "description": "Digital distribution platform for PC gaming",
+          "downloadUrl": "https://store.steampowered.com/about/",
+          "version": "Latest",
+          "icon": "https://store.steampowered.com/favicon.ico",
+          "size": "1MB",
+          "category": "Gaming"
+        },
+        {
+          "id": "epic-games",
+          "name": "Epic Games Launcher",
+          "description": "Digital storefront for PC and Mac video games",
+          "downloadUrl": "https://www.epicgames.com/store/en-US/download",
+          "version": "Latest",
+          "icon": "https://www.epicgames.com/favicon.ico",
+          "size": "75MB",
+          "category": "Gaming"
+        },
+        {
+          "id": "origin",
+          "name": "EA App",
+          "description": "Digital distribution platform by Electronic Arts",
+          "downloadUrl": "https://www.ea.com/ea-app",
+          "version": "Latest",
+          "icon": "https://www.ea.com/favicon.ico",
+          "size": "45MB",
+          "category": "Gaming"
+        }
+      ]
+    }
+  ]
+}
